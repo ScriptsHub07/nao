@@ -1,2 +1,2 @@
-Flask
-supabase
+Flask==2.3.2
+supabase==1.0.3
