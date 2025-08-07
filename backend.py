@@ -4,10 +4,11 @@ import os
 
 app = Flask(__name__)
 
-url = "https://ohcueiiahpywgvwglmqj.supabase.co"
-key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9oY3VlaWlhaHB5d2d2d2dsbXFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQxMzkwMDAsImV4cCI6MjA2OTcxNTAwMH0.99XL1ZheV0pTA09TqiAffNBfSURE22zzRS3mRDyjoi0"
+# Supabase config
+SUPABASE_URL = "https://ohcueiiahpywgvwglmqj.supabase.co"
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9oY3VlaWlhaHB5d2d2d2dsbXFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQxMzkwMDAsImV4cCI6MjA2OTcxNTAwMH0.99XL1ZheV0pTA09TqiAffNBfSURE22zzRS3mRDyjoi0"
 
-supabase = create_client(url, key)
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 @app.route('/verificar', methods=['POST'])
 def verificar():
@@ -17,7 +18,6 @@ def verificar():
     if not chave:
         return jsonify({'status': 'erro', 'mensagem': 'Chave não fornecida'}), 400
 
-    # Busca chave específica
     response = supabase.table("licenses").select("*").eq("key", chave).execute()
 
     if not response.data:
@@ -31,13 +31,12 @@ def verificar():
     if licenca["usos"] >= licenca["limite"]:
         return jsonify({'status': 'limite', 'mensagem': 'Licença atingiu o limite de uso'}), 403
 
-    # Atualiza o contador de uso
+    # Atualiza uso
     supabase.table("licenses").update({"usos": licenca["usos"] + 1}).eq("key", chave).execute()
 
     return jsonify({'status': 'valida', 'mensagem': 'Licença válida'}), 200
 
-    if __name__ == '__main__':
-        import os
-        port = int(os.environ.get('PORT', 5000))
-        app.run(host='0.0.0.0', port=port)
-
+# 🔥 Requisito para funcionar na Render
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
